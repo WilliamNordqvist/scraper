@@ -9,7 +9,7 @@
     "node-cron": "^3.0.2"
   },
   "scripts": {
-    "start":"node index.js"
+    "start": "node index.js"
   },
   "devDependencies": {
     "eslint": "^8.31.0",
