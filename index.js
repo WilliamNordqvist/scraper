@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000
 
 app.listen(port, () => {
 
-  cron.schedule("*/1 * * * * *", () => {
+  cron.schedule("*/30 * * * * *", () => {
     axios.post(
       "https://script.google.com/macros/s/AKfycbxpTRsgmIxbR_MMcjUCzans00TGaHLOmIADVl1rZ9RBQbOnIFLbg6RR7O7cwr-wrhI6NA/exec",
       ["from code"]
