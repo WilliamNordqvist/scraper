@@ -1,22 +1,48 @@
+/* eslint-disable no-undef */
 const cron = require("node-cron");
 const axios = require("axios");
-const app = require("express")()
+const app = require("express")();
+const cheerio = require("cheerio");
+const { format } = require("date-fns");
 
-// eslint-disable-next-line no-undef
-const port = process.env.PORT || 3000
+require("dotenv").config();
 
+const port = process.env.PORT || 3000;
 
+const scraper = async () => {
+  const response = await axios.get("https://www.klart.se/se/");
 
+  const html = response.data;
+  const $ = cheerio.load(html);
+  const allCities = $(".place-item div");
 
-app.listen(port, () => {
+  const mappedCities = allCities.map((i, city) => {
+    const cityName = $(city).find("h4").text();
+    const temp = $(city).find(".temp").text().replace(/°/g, "");
 
-  cron.schedule("*/30 * * * * *", () => {
-    axios.post(
-      "https://script.google.com/macros/s/AKfycbxpTRsgmIxbR_MMcjUCzans00TGaHLOmIADVl1rZ9RBQbOnIFLbg6RR7O7cwr-wrhI6NA/exec",
-      ["from code"]
-    );
-  
-    console.log("running a task every 10 second");
+    return {
+      name: cityName,
+      temp,
+    };
   });
 
-})
+  return {
+    data: mappedCities.toArray(),
+    date: format(new Date(), "yyyy/MM/dd"),
+  };
+};
+
+app.listen(port, () => {
+  console.log("SERVER STARTED");
+
+  cron.schedule( "00 00 12 * * *", async () => {
+      console.log("Fetching data");
+      const res = await scraper(); 
+      axios.post(process.env.URL, res);
+    },
+    {
+      scheduled: true,
+      timezone: "Europe/Stockholm",
+    }
+  );
+});
