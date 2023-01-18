@@ -35,7 +35,7 @@ const scraper = async () => {
 app.listen(port, () => {
   console.log("SERVER STARTED");
 
-  cron.schedule( "00 30 15 * * *", async () => {
+  cron.schedule( "00 00 12 * * *", async () => {
       console.log("Fetching data");
       const res = await scraper(); 
       axios.post(process.env.URL, res);
